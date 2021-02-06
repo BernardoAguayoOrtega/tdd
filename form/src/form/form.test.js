@@ -47,12 +47,25 @@ describe('when the user submits the form without values', () => {
 
 describe('when the user blurs an empty field', () => {
   beforeEach(() => render(<Form />))
-  it('should display a validation error message', () => {
+  it('should display a validation error message name filed', () => {
+
+    expect(screen.queryByText(/the name is required/i)).not.toBeInTheDocument()
 
     const name = screen.queryByLabelText(/name/i)
 
     fireEvent.blur(name, {target:{name: 'name', value: ''}})
 
     expect(screen.queryByText(/the name is required/i)).toBeInTheDocument()
+  })
+
+  it('should display a validation error message size label', () => {
+
+    expect(screen.queryByText(/the size is required/i)).not.toBeInTheDocument()
+
+    const size = screen.queryByLabelText(/size/i)
+
+    fireEvent.blur(size, {target:{name: 'size', value: ''}})
+
+    expect(screen.queryByText(/the size is required/i)).toBeInTheDocument()
   })
 })

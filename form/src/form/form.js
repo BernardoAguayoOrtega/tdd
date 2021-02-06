@@ -33,7 +33,7 @@ const Form = () => {
 
     setFormErrors({
       ...formErrors,
-      [name]: value.length ? '' : 'The name is required',
+      [name]: value.length ? '' : `The ${name} is required`,
     })
   }
 
@@ -43,7 +43,7 @@ const Form = () => {
       <form onSubmit={handleSubmit}>
         <TextField name="name" label="name" id="name" helperText={formErrors.name} onBlur={handleBlur}/>
 
-        <TextField label="size" id="size" helperText={formErrors.size} />
+        <TextField name="size" label="size" id="size" helperText={formErrors.size} onBlur={handleBlur}/>
 
         <InputLabel htmlFor="type">Type</InputLabel>
 
