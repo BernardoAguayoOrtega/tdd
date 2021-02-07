@@ -1,7 +1,6 @@
-import React from 'react'
 import {InputLabel, Select, Button} from '@material-ui/core'
 import TextField from '@material-ui/core/TextField'
-import {useState} from 'react'
+import React, {useState} from 'react'
 
 const Form = () => {
   const [formErrors, setFormErrors] = useState({
@@ -9,6 +8,8 @@ const Form = () => {
     size: '',
     type: '',
   })
+
+  const [isSaving, setIsSaving] = useState(false)
 
   const handleSubmit = event => {
     event.preventDefault()
@@ -26,6 +27,8 @@ const Form = () => {
     if (!type.value) {
       setFormErrors(prevState => ({...prevState, type: 'the type is required'}))
     }
+
+    setIsSaving(value => !value)
   }
 
   const handleBlur = event => {
@@ -41,15 +44,26 @@ const Form = () => {
     <>
       <h1>create product</h1>
       <form onSubmit={handleSubmit}>
-        <TextField name="name" label="name" id="name" helperText={formErrors.name} onBlur={handleBlur}/>
+        <TextField
+          name="name"
+          label="name"
+          id="name"
+          helperText={formErrors.name}
+          onBlur={handleBlur}
+        />
 
-        <TextField name="size" label="size" id="size" helperText={formErrors.size} onBlur={handleBlur}/>
+        <TextField
+          name="size"
+          label="size"
+          id="size"
+          helperText={formErrors.size}
+          onBlur={handleBlur}
+        />
 
         <InputLabel htmlFor="type">Type</InputLabel>
 
         <Select
           native
-          value=""
           inputProps={{
             name: 'type',
             id: 'type',
@@ -61,9 +75,9 @@ const Form = () => {
           <option value="clothing">clothing</option>
         </Select>
 
-        {formErrors.type.length && <p>{formErrors.type}</p>}
+        {formErrors.type.length ? <p>{formErrors.type}</p> : ''}
 
-        <Button type="submit">Submit</Button>
+        <Button type="submit" disabled={isSaving}>Submit</Button>
       </form>
     </>
   )
