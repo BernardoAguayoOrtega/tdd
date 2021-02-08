@@ -1,11 +1,26 @@
 import React from 'react'
-import {screen, render, fireEvent} from '@testing-library/react'
+import {screen, render, fireEvent, waitFor} from '@testing-library/react'
+import {rest} from 'msw'
+import {setupServer} from 'msw/node'
 
 import Form from './form'
 
-describe('when the form is mounted', () => {
-  beforeEach(() => render(<Form />))
+const server = setupServer(
+  rest.post('/products', (req, res, ctx) => res(ctx.status(201))),
+)
 
+// Enable API mocking before tests.
+beforeAll(() => server.listen())
+
+// Reset any runtime request handlers we may add during the tests.
+afterEach(() => server.resetHandlers())
+
+// Disable API mocking after the tests are done.
+afterAll(() => server.close())
+
+beforeEach(() => render(<Form />))
+
+describe('when the form is mounted', () => {
   it('there must be a create product form page', () => {
     expect(
       screen.getByRole('heading', {name: /create product/i}),
@@ -28,9 +43,7 @@ describe('when the form is mounted', () => {
 })
 
 describe('when the user submits the form without values', () => {
-  beforeEach(() => render(<Form />))
-
-  it('should display validation messages', () => {
+  it('should display validation messages', async () => {
     expect(screen.queryByText(/the name is required/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/the size is required/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/the type is required/i)).not.toBeInTheDocument()
@@ -42,11 +55,12 @@ describe('when the user submits the form without values', () => {
     expect(screen.queryByText(/the name is required/i)).toBeInTheDocument()
     expect(screen.queryByText(/the size is required/i)).toBeInTheDocument()
     expect(screen.queryByText(/the type is required/i)).toBeInTheDocument()
+
+    await waitFor(() => expect(button).not.toBeDisabled())
   })
 })
 
 describe('when the user blurs an empty field', () => {
-  beforeEach(() => render(<Form />))
   it('should display a validation error message name filed', () => {
     expect(screen.queryByText(/the name is required/i)).not.toBeInTheDocument()
 
@@ -69,9 +83,7 @@ describe('when the user blurs an empty field', () => {
 })
 
 describe('when the user submits the form', () => {
-  beforeEach(() => render(<Form />))
-  it('should the submit button be disabled until de request is done', () => {
-
+  it('should the submit button be disabled until de request is done', async () => {
     const button = screen.getByRole('button', {name: /submit/i})
 
     expect(button).not.toBeDisabled()
@@ -79,5 +91,7 @@ describe('when the user submits the form', () => {
     fireEvent.click(button)
 
     expect(button).toBeDisabled()
+
+    await waitFor(() => expect(button).not.toBeDisabled())
   })
 })

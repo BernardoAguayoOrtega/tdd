@@ -11,22 +11,33 @@ const Form = () => {
 
   const [isSaving, setIsSaving] = useState(false)
 
-  const handleSubmit = event => {
-    event.preventDefault()
+  const validateField = ({name, value}) => {
+    setFormErrors(prevState => ({
+      ...prevState,
+      [name]: value.length ? '' : `the ${name} is required`,
+    }))
+  }
 
+  const validateForm = event => {
     const {name, size, type} = event.target.elements
 
-    if (!name.value) {
-      setFormErrors(prevState => ({...prevState, name: 'the name is required'}))
-    }
+    validateField({name: 'name', value: name.value})
+    validateField({name: 'size', value: size.value})
+    validateField({name: 'type', value: type.value})
 
-    if (!size.value) {
-      setFormErrors(prevState => ({...prevState, size: 'the size is required'}))
-    }
+  }
 
-    if (!type.value) {
-      setFormErrors(prevState => ({...prevState, type: 'the type is required'}))
-    }
+  const handleSubmit = async event => {
+    event.preventDefault()
+
+    setIsSaving(value => !value)
+
+    validateForm(event)
+
+    await fetch('/products', {
+      method: 'POST',
+      body: JSON.stringify({}),
+    })
 
     setIsSaving(value => !value)
   }
@@ -77,7 +88,9 @@ const Form = () => {
 
         {formErrors.type.length ? <p>{formErrors.type}</p> : ''}
 
-        <Button type="submit" disabled={isSaving}>Submit</Button>
+        <Button type="submit" disabled={isSaving}>
+          Submit
+        </Button>
       </form>
     </>
   )
