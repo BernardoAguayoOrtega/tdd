@@ -45,10 +45,7 @@ const Form = () => {
   const handleBlur = event => {
     const {name, value} = event.target
 
-    setFormErrors({
-      ...formErrors,
-      [name]: value.length ? '' : `The ${name} is required`,
-    })
+    validateField({name, value})
   }
 
   return (
