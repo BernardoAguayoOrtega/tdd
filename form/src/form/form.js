@@ -1,6 +1,7 @@
 import {InputLabel, Select, Button} from '@material-ui/core'
 import TextField from '@material-ui/core/TextField'
 import React, {useState} from 'react'
+import saveProduct from '../services/productServicing'
 
 const Form = () => {
   const [formErrors, setFormErrors] = useState({
@@ -24,7 +25,6 @@ const Form = () => {
     validateField({name: 'name', value: name.value})
     validateField({name: 'size', value: size.value})
     validateField({name: 'type', value: type.value})
-
   }
 
   const handleSubmit = async event => {
@@ -34,10 +34,7 @@ const Form = () => {
 
     validateForm(event)
 
-    await fetch('/products', {
-      method: 'POST',
-      body: JSON.stringify({}),
-    })
+    await saveProduct()
 
     setIsSaving(value => !value)
   }
