@@ -2,11 +2,12 @@ import React from 'react'
 import {screen, render, fireEvent, waitFor} from '@testing-library/react'
 import {rest} from 'msw'
 import {setupServer} from 'msw/node'
+import {createdStatus} from '../consts/httpStatus'
 
 import Form from './form'
 
 const server = setupServer(
-  rest.post('/products', (req, res, ctx) => res(ctx.status(201))),
+  rest.post('/products', (req, res, ctx) => res(ctx.status(createdStatus))),
 )
 
 // Enable API mocking before tests.
@@ -93,5 +94,17 @@ describe('when the user submits the form', () => {
     expect(button).toBeDisabled()
 
     await waitFor(() => expect(button).not.toBeDisabled())
+  })
+
+  it('the form page must display the success message "Product stored" and clean the fields values', async () => {
+    const button = screen.getByRole('button', {name: /submit/i})
+
+    expect(button).not.toBeDisabled()
+
+    fireEvent.click(button)
+
+    await waitFor(() =>
+      expect(screen.getByText(/Product stored/i)).toBeInTheDocument(),
+    )
   })
 })
