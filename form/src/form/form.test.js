@@ -2,12 +2,20 @@ import React from 'react'
 import {screen, render, fireEvent, waitFor} from '@testing-library/react'
 import {rest} from 'msw'
 import {setupServer} from 'msw/node'
-import {createdStatus} from '../consts/httpStatus'
+import {CREATED_STATUS, ERROR_SERVER_STATUS} from '../consts/httpStatus'
 
 import Form from './form'
 
 const server = setupServer(
-  rest.post('/products', (req, res, ctx) => res(ctx.status(createdStatus))),
+  rest.post('/products', (req, res, ctx) => {
+    const {name, size, type} = req.body
+
+    if (name && size && type) {
+      return res(ctx.status(CREATED_STATUS))
+    }
+
+    return res(ctx.status(ERROR_SERVER_STATUS))
+  }),
 )
 
 // Enable API mocking before tests.
@@ -98,8 +106,19 @@ describe('when the user submits the form', () => {
 
   it('the form page must display the success message "Product stored" and clean the fields values', async () => {
     const button = screen.getByRole('button', {name: /submit/i})
+    const nameLabel = screen.getByLabelText(/name/i) 
+    const sizeLabel = screen.getByLabelText(/size/i) 
+    const typeLabel = screen.getByLabelText(/type/i) 
+
+    expect(nameLabel).toBeInTheDocument()
+    expect(sizeLabel).toBeInTheDocument()
+    expect(typeLabel).toBeInTheDocument()
 
     expect(button).not.toBeDisabled()
+
+    fireEvent.change(nameLabel, {target: {name: 'name', value: 'my product'}})
+    fireEvent.change(sizeLabel, {target: {name: 'name', value: '10'}})
+    fireEvent.change(typeLabel, {target: {name: 'name', value: 'electronic'}})
 
     fireEvent.click(button)
 

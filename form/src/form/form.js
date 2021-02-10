@@ -2,7 +2,7 @@ import {InputLabel, Select, Button} from '@material-ui/core'
 import TextField from '@material-ui/core/TextField'
 import React, {useState} from 'react'
 import saveProduct from '../services/productServicing'
-import {createdStatus} from '../consts/httpStatus'
+import {CREATED_STATUS} from '../consts/httpStatus'
 
 const Form = () => {
   const [formErrors, setFormErrors] = useState({
@@ -22,9 +22,7 @@ const Form = () => {
     }))
   }
 
-  const validateForm = event => {
-    const {name, size, type} = event.target.elements
-
+  const validateForm = ({name, size, type}) => {
     validateField({name: 'name', value: name.value})
     validateField({name: 'size', value: size.value})
     validateField({name: 'type', value: type.value})
@@ -35,11 +33,13 @@ const Form = () => {
 
     setIsSaving(value => !value)
 
-    validateForm(event)
+    const {name, size, type} = event.target.elements
 
-    const response = await saveProduct()
+    validateForm({name, size, type})
 
-    if (response?.status === createdStatus) setIsSuccess(true)
+    const response = await saveProduct({name, size, type})
+
+    if (response?.status === CREATED_STATUS) setIsSuccess(true)
 
     setIsSaving(value => !value)
   }
